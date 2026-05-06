@@ -35,7 +35,8 @@ class DataLoader:
             k.alamat,
             k.lokasi_geo,
             k.htm_min,
-            k.htm_max
+            k.htm_max,
+            k.rating
         FROM kuliner k
         JOIN kategori_kuliner kk ON k.kategori_kuliner_id = kk.kategori_kuliner_id
         '''
