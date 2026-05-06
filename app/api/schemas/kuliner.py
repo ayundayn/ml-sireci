@@ -17,7 +17,7 @@ class KulinerRecommendRequest(BaseModel):
 class KulinerItem(BaseModel):
     kuliner_id: Optional[int] = None
     nama_tempat: str
-    kategori_kuliner_id: str
+    kategori: Optional[str] = None
     jam_buka: str
     jam_tutup: str
     alamat: str

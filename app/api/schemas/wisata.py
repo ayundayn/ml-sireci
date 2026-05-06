@@ -17,7 +17,7 @@ class WisataRecommendRequest(BaseModel):
 class WisataItem(BaseModel):
     wisata_id: Optional[int] = None
     nama_tempat: str
-    kategori_wisata_id: str
+    kategori: Optional[str] = None
     jam_buka: str
     jam_tutup: str
     alamat: str

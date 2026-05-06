@@ -29,12 +29,16 @@ def initialize_service():
         df = data_loader.load_wisata()
         wisata_recommender.load_data(df)
 
-        # Generate sample ratings
-        sample_ratings = pd.DataFrame({
-            'user_id': np.random.randint(1, 15, 80),
-            'wisata': np.random.choice(df['nama_tempat'].tolist(), 80),
-            'rating': np.random.randint(3, 6, 80)
-        })
+        # Load ratings from database
+        sample_ratings = data_loader.load_ratings_wisata()
+
+        # Fallback: generate sample ratings if no ratings in DB
+        if len(sample_ratings) == 0:
+            sample_ratings = pd.DataFrame({
+                'user_id': np.random.randint(1, 15, 80),
+                'wisata': np.random.choice(df['nama_tempat'].tolist(), 80),
+                'rating': np.random.randint(3, 6, 80)
+            })
 
         # Build CF matrix
         wisata_recommender.build_user_item_matrix(sample_ratings)
@@ -74,7 +78,7 @@ async def recommend_wisata(request: WisataRecommendRequest):
             items.append({
                 "wisata_id": row.get('wisata_id'),
                 "nama_tempat": row['nama_tempat'],
-                "kategori_wisata_id": row['kategori_wisata_id'],
+                "kategori": row.get('kategori'),
                 "jam_buka": str(row['jam_buka']),
                 "jam_tutup": str(row['jam_tutup']),
                 "alamat": row['alamat'],

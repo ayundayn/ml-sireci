@@ -39,10 +39,12 @@ class BaseRecommender(ABC):
 
     def _build_matrix(self, interaction_df: pd.DataFrame):
         """Build user-item matrix"""
+        # Aggregate duplicates by taking mean
         matrix = interaction_df.pivot_table(
             index='user_id',
             columns=self._item_column,
-            values='rating'
+            values='rating',
+            aggfunc='mean'  # Handle duplicates by taking mean
         ).fillna(0)
         return matrix
 

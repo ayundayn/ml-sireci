@@ -44,7 +44,7 @@ class KulinerRecommender(BaseRecommender):
         """Content-based filtering untuk kuliner"""
         filtered = self.df[
             (self.df[self._name_column].isin(item_list)) &
-            (self.df['kategori_kuliner_id'].isin(kategori)) &
+            (self.df['kategori'].isin(kategori)) &
             (self.df['htm_min'] >= budget_min) &
             (self.df['htm_max'] <= budget_max) &
             (self.df['rating'] >= rating_min)

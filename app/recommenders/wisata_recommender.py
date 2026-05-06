@@ -44,7 +44,7 @@ class WisataRecommender(BaseRecommender):
         """Content-based filtering untuk wisata"""
         filtered = self.df[
             (self.df[self._name_column].isin(item_list)) &
-            (self.df['kategori_wisata_id'].isin(kategori)) &
+            (self.df['kategori'].isin(kategori)) &
             (self.df['htm_min_domestik'] >= budget_min) &
             (self.df['htm_max_domestik'] <= budget_max) &
             (self.df['rating'] >= rating_min)

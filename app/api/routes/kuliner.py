@@ -29,12 +29,16 @@ def initialize_service():
         df = data_loader.load_kuliner()
         kuliner_recommender.load_data(df)
 
-        # Generate sample ratings
-        sample_ratings = pd.DataFrame({
-            'user_id': np.random.randint(1, 15, 80),
-            'kuliner': np.random.choice(df['nama_tempat'].tolist(), 80),
-            'rating': np.random.randint(3, 6, 80)
-        })
+        # Load ratings from database
+        sample_ratings = data_loader.load_ratings_kuliner()
+
+        # Fallback: generate sample ratings if no ratings in DB
+        if len(sample_ratings) == 0:
+            sample_ratings = pd.DataFrame({
+                'user_id': np.random.randint(1, 15, 80),
+                'kuliner': np.random.choice(df['nama_tempat'].tolist(), 80),
+                'rating': np.random.randint(3, 6, 80)
+            })
 
         # Build CF matrix
         kuliner_recommender.build_user_item_matrix(sample_ratings)
@@ -74,7 +78,7 @@ async def recommend_kuliner(request: KulinerRecommendRequest):
             items.append({
                 "kuliner_id": row.get('kuliner_id'),
                 "nama_tempat": row['nama_tempat'],
-                "kategori_kuliner_id": row['kategori_kuliner_id'],
+                "kategori": row.get('kategori'),
                 "jam_buka": str(row['jam_buka']),
                 "jam_tutup": str(row['jam_tutup']),
                 "alamat": row['alamat'],
