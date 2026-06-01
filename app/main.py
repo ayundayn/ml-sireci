@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.api.routes import health, kuliner, wisata
+from app.api.routes import itinerary
 
 app = FastAPI(
     title="Banyu Guide ML Service",
@@ -17,6 +18,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(
+    itinerary.router,
+    prefix="/api",
+    tags=["Itinerary"]
+)
 
 @app.get("/")
 async def root():

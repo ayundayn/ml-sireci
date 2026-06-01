@@ -1,6 +1,8 @@
 import pandas as pd
 import pymysql
 from app.config import settings
+# from app.database import SessionLocal
+# from app.models import Wisata, Kuliner
 
 
 class DataLoader:
@@ -9,6 +11,7 @@ class DataLoader:
     def __init__(self):
         self.kuliner_df = None
         self.wisata_df = None
+        # self.db = SessionLocal()
 
     def _get_connection(self):
         """Get MySQL connection"""
@@ -85,7 +88,19 @@ class DataLoader:
             k.nama_tempat as kuliner,
             rk.nilai_rating as rating
         FROM rating_kuliner rk
-        JOIN kuliner k ON rk.kuliner_id = k.kuliner_id
+        JOIN kuliner k
+            ON rk.kuliner_id = k.kuliner_id
+
+        UNION ALL
+
+        SELECT
+            fk.user_id,
+            k.nama_tempat as kuliner,
+            5.0 as rating
+        FROM favorit_kuliner fk
+        JOIN kuliner k
+            ON fk.kuliner_id = k.kuliner_id
+
         ORDER BY user_id
         '''
 
@@ -104,7 +119,19 @@ class DataLoader:
             w.nama_tempat as wisata,
             rw.nilai_rating as rating
         FROM rating_wisata rw
-        JOIN wisata w ON rw.wisata_id = w.wisata_id
+        JOIN wisata w
+            ON rw.wisata_id = w.wisata_id
+
+        UNION ALL
+
+        SELECT
+            fw.user_id,
+            w.nama_tempat as wisata,
+            5.0 as rating
+        FROM favorit_wisata fw
+        JOIN wisata w
+            ON fw.wisata_id = w.wisata_id
+
         ORDER BY user_id
         '''
 
@@ -149,3 +176,25 @@ class DataLoader:
         df = df.drop_duplicates(subset='nama_tempat', keep='first')
 
         return df
+    
+    def load_jarak(self):
+        return pd.read_excel("app/datasets/dataset_jarak.xlsx", index_col=0)
+
+    def load_waktu(self):
+        return pd.read_excel("app/datasets/dataset_waktu.xlsx", index_col=0)
+
+    def load_all(self):
+
+        df_wisata = self.load_wisata()
+        df_kuliner = self.load_kuliner()
+
+        df_jarak = self.load_jarak()
+        df_waktu = self.load_waktu()
+
+        return (
+            df_wisata,
+            df_kuliner,
+            df_jarak,
+            df_waktu
+        )
+    

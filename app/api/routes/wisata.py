@@ -53,6 +53,12 @@ def initialize_service():
 async def recommend_wisata(request: WisataRecommendRequest):
     """Get rekomendasi wisata menggunakan hybrid filtering"""
 
+    sample_ratings = data_loader.load_ratings_wisata()
+
+    wisata_recommender.build_user_item_matrix(
+        sample_ratings
+    )
+    
     try:
         # Get hybrid recommendations
         result_df = wisata_recommender.recommend_hybrid(

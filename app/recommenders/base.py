@@ -104,15 +104,19 @@ class BaseRecommender(ABC):
         rating_min: float,
         top_n: int = 10
     ) -> pd.DataFrame:
-        """Hybrid recommendation: CF + Content-based"""
-        # Get CF recommendations
-        cf_items = self.recommend_cf(user_id, top_n=top_n * 2)
 
-        # Fallback if CF returns few items
-        if len(cf_items) < 5:
-            cf_items = self.df[self._name_column].tolist()
+        # CF sebagai kandidat awal
+        cf_items = self.recommend_cf(
+            user_id,
+            top_n=len(self.df)
+        )
 
-        # Apply content-based filtering
+        # Cold start
+        if not cf_items:
+            cf_items = self.df[
+                self.df['kategori'].isin(kategori)
+            ][self._name_column].tolist()
+
         result = self.recommend_content_based(
             cf_items,
             kategori,
@@ -122,4 +126,67 @@ class BaseRecommender(ABC):
             top_n
         )
 
-        return result
+        # ==================================================
+        # Pastikan semua kategori pilihan user terwakili
+        # ==================================================
+
+        kategori_muncul = set()
+
+        if not result.empty:
+            kategori_muncul = set(
+                result['kategori'].unique()
+            )
+
+        kategori_hilang = [
+            k for k in kategori
+            if k not in kategori_muncul
+        ]
+
+        if kategori_hilang:
+
+            tambahan = self.df[
+                (self.df['kategori'].isin(kategori_hilang))
+                &
+                (self.df['rating'] >= rating_min)
+            ].copy()
+
+            # filter budget juga
+            if 'htm_min_domestik' in tambahan.columns:
+                tambahan = tambahan[
+                    (tambahan['htm_min_domestik'] <= budget_max)
+                    &
+                    (tambahan['htm_max_domestik'] >= budget_min)
+                ]
+
+            elif 'htm_min' in tambahan.columns:
+                tambahan = tambahan[
+                    (tambahan['htm_min'] <= budget_max)
+                    &
+                    (tambahan['htm_max'] >= budget_min)
+                ]
+
+            if not tambahan.empty:
+
+                max_rating = tambahan['rating'].max()
+                
+                global_max = self.df['rating'].max()
+
+                tambahan['skor_rekomendasi'] = (
+                    tambahan['rating'] / global_max
+                ).round(2)
+
+            result = pd.concat(
+                [result, tambahan],
+                ignore_index=True
+            )
+
+            result = result.drop_duplicates(
+                subset=self._name_column
+            )
+
+            result = result.sort_values(
+                by='rating',
+                ascending=False
+            )
+
+        return result.head(top_n)

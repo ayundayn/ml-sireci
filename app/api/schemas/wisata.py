@@ -5,7 +5,7 @@ from typing import List, Optional
 class WisataRecommendRequest(BaseModel):
     user_id: int = Field(..., description="ID user", ge=1)
     kategori: List[str] = Field(
-        default=["Wisata Alam", "Wisata Budaya", "Wisata Edukasi", "Wisata Religi"],
+        default=["Wisata Alam", "Wisata Budaya", "Wisata Edukasi", "Wisata Religi", "Wisata Belanja"],
         description="Filter kategori wisata"
     )
     budget_min: float = Field(default=0, description="Budget minimum", ge=0)

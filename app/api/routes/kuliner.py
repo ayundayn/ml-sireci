@@ -53,6 +53,12 @@ def initialize_service():
 async def recommend_kuliner(request: KulinerRecommendRequest):
     """Get rekomendasi kuliner menggunakan hybrid filtering"""
 
+    sample_ratings = data_loader.load_ratings_kuliner()
+
+    kuliner_recommender.build_user_item_matrix(
+        sample_ratings
+    )
+
     try:
         # Get hybrid recommendations
         result_df = kuliner_recommender.recommend_hybrid(
