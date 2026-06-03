@@ -8,3 +8,5 @@ class ItineraryRequest(BaseModel):
 
     total_hari: int = 1
     budget: int = 1000000
+    start_time: str = "08:00"
+    end_time: str = "20:00"

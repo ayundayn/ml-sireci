@@ -11,13 +11,6 @@ class ItineraryEngine:
 
         self.data_loader = data_loader
 
-        (
-            self.df_wisata,
-            self.df_kuliner,
-            self.df_jarak,
-            self.df_waktu
-        ) = self.data_loader.load_all()
-
     def generate(
         self,
         wisata_ids,
@@ -27,14 +20,6 @@ class ItineraryEngine:
         start_time="08:00",
         end_time="20:00"
     ):
-
-        df_wisata = self.data_loader.load_wisata()
-
-        df_kuliner = self.data_loader.load_kuliner()
-
-        df_jarak = self.data_loader.load_jarak()
-
-        df_waktu = self.data_loader.load_waktu()
         
         # =========================
         # FILTER DESTINASI USER
